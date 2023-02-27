@@ -583,6 +583,36 @@ namespace GADE6112
             _controller.Hero.Attack(enemy);
         }
 
+        public abstract class Item : Tile
+        {
+            public Item(int x, int y) : base(x, y, ' ')
+            {
+            }
+
+            public abstract override string ToString();
+        }
+        public class Gold : Item
+        {
+            private int amount;
+            private Random random;
+
+            public int Amount
+            {
+                get { return amount; }
+            }
+
+            public Gold(int x, int y) : base(x, y)
+            {
+                random = new Random();
+                amount = random.Next(1, 6);
+            }
+
+            public override string ToString()
+            {
+                return "Gold (" + amount + ")";
+            }
+        }
+
     }
 
 }
