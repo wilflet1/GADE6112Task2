@@ -19,7 +19,7 @@ namespace GADE6112
             public int Y { get; set; }
             public int X { get; set; }
             protected char Symbol { get; set; }
-            public enum TileType { Hero, SwampCreature, Gold, Weapon, Obstacle, Empty };
+            public enum TileType { Hero, SwampCreature, Gold, Weapon, Obstacle, Empty, Mage };
             public TileType Type { get; set; }
 
             public bool IsValidMove(Movement direction)
@@ -43,7 +43,7 @@ namespace GADE6112
                     default:
                         break;
                 }
-                GameEngine gm = new GameEngine();
+                //GameEngine gm = new GameEngine();
                 Controller _controller = new Controller();
                 Map map = _controller.Map;
                 if (nextX < 0 || nextX >= map.Width || nextY < 0 || nextY >= map.Height)
@@ -263,7 +263,13 @@ namespace GADE6112
         public class Hero : Character
         {
             private const int HERO_DAMAGE = 2;
+            private int goldCount;
 
+            public int GoldCount
+            {
+                get { return goldCount; }
+                set { goldCount = value; }
+            }
             public Hero(int x, int y, char symbol, int hp) : base(x, y, 'H')
             {
                 Damage = HERO_DAMAGE;
@@ -348,14 +354,16 @@ namespace GADE6112
         {
             private Tile[,] tiles;
             private Hero hero;
-            private SwampCreature[] swampCreatures;
+            private Enemy[] enemies;
+            private Item[] items;
             private int width;
             private int height;
             private Random random;
-
+           
+            public List<Enemy> EnemiesLst { get; set; }
             public void RemoveEnemy(int x, int y)
             {
-                tiles[x, y].Type = TileType.Empty;
+                Tiles[x, y].Type = TileType.Empty;
             }
 
             public Tile[,] Tiles
@@ -370,10 +378,16 @@ namespace GADE6112
                 set { hero = value; }
             }
 
-            public SwampCreature[] SwampCreatures
+            public Enemy[] Enemies
             {
-                get { return swampCreatures; }
-                set { swampCreatures = value; }
+                get { return enemies; }
+                set { enemies = value; }
+            }
+
+            public Item[] Items
+            {
+                get { return items; }
+                set { items = value; }
             }
 
             public int Width
@@ -393,14 +407,14 @@ namespace GADE6112
                 get { return random; }
                 set { random = value; }
             }
-            public Map(int minWidth, int maxWidth, int minHeight, int maxHeight, int numEnemies)
+
+            public Map(int minWidth, int maxWidth, int minHeight, int maxHeight, int numEnemies, int numItems)
             {
                 random = new Random();
 
                 width = random.Next(minWidth, maxWidth + 1);
                 height = random.Next(minHeight, maxHeight + 1);
 
-                tiles = new Tile[height, width];
 
                 for (int i = 0; i < height; i++)
                 {
@@ -408,23 +422,32 @@ namespace GADE6112
                     {
                         if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
                         {
-                            tiles[i, j] = new Obstacle(j, i, '#');
+                            Tiles[i, j] = new Obstacle(j, i, '#');
                         }
                         else
                         {
-                            tiles[i, j] = new EmptyTile(j, i, '.');
+                            Tiles[i, j] = new EmptyTile(j, i, '.');
                         }
                     }
                 }
 
-                hero = (Hero)Create(TileType.Hero);
-                tiles[hero.Y, hero.X] = hero;
+                //hero = (Hero)Create(TileType.Hero);
+                //Tiles[hero.Y, hero.X] = hero;
 
-                swampCreatures = new SwampCreature[numEnemies];
+                enemies = new Enemy[numEnemies];
                 for (int i = 0; i < numEnemies; i++)
                 {
-                    swampCreatures[i] = (SwampCreature)Create(TileType.SwampCreature);
-                    tiles[swampCreatures[i].Y, swampCreatures[i].X] = swampCreatures[i];
+                    int rand = random.Next(1, 3);
+                    if (rand == 1)
+                    {
+                        enemies[i] = (SwampCreature)Create(TileType.SwampCreature);
+                    }
+                    if (rand == 2)
+                    {
+                        enemies[i] = (Mage)Create(TileType.Mage);
+                    }
+
+                    tiles[enemies[i].Y, enemies[i].X] = enemies[i];
                 }
 
                 UpdateVision();
@@ -432,15 +455,27 @@ namespace GADE6112
 
             public void UpdateVision()
             {
-                //foreach (Character character in GetCharacters())
-                //{
-                //    int x = character.X;
-                //    int y = character.Y;
+                //character.Vision[0] = tiles[y + 1, x];
+                //character.Vision[1] = tiles[y - 1, x];
+                //character.Vision[2] = tiles[y, x - 1];
+                //character.Vision[3] = tiles[y, x + 1];
 
-                //    character.Vision[0] = tiles[y + 1, x];
-                //    character.Vision[1] = tiles[y - 1, x];
-                //    character.Vision[2] = tiles[y, x - 1];
-                //    character.Vision[3] = tiles[y, x + 1];
+                //// Check if there are any items in adjacent tiles
+                //for (int i = y - 1; i <= y + 1; i++)
+                //{
+                //    for (int j = x - 1; j <= x + 1; j++)
+                //    {
+                //        if (i < 0 || i >= height || j < 0 || j >= width || (i == y && j == x))
+                //        {
+                //            continue;
+                //        }
+
+                //        if (tiles[i, j] is ItemTile)
+                //        {
+                //            ItemTile itemTile = (ItemTile)tiles[i, j];
+                //            character.Vision[4] = itemTile;
+                //        }
+                //    }
                 //}
             }
 
@@ -461,19 +496,23 @@ namespace GADE6112
                         return new Hero(x, y, 'H', 1);
                     case TileType.SwampCreature:
                         return new SwampCreature(x, y);
+                    case TileType.Mage:
+                        return new Mage(x, y);
+                    case TileType.Gold:
+                        return new Gold(x, y, random.Next(1,6));
                     default:
                         return null;
                 }
             }
-
             private List<Character> GetCharacters()
             {
                 List<Character> characters = new List<Character>();
                 characters.Add(hero);
-                characters.AddRange(swampCreatures);
+                characters.AddRange(enemies);
                 return characters;
             }
         }
+
 
         public class GameEngine
         {
@@ -481,7 +520,7 @@ namespace GADE6112
 
             public GameEngine()
             {
-                _map = new Map(10, 20, 10, 20, 5);
+                _map = new Map(10, 20, 10, 20, 5, 5);
                 // Set initial player position to the center of the map
                 _map.Hero.X = 5;
                 _map.Hero.Y = 5;
@@ -519,6 +558,14 @@ namespace GADE6112
                 {
                     tile.Type = TileType.Hero;
                     _map.Tiles[previosPosX, previosPosY].Type = TileType.Empty;
+
+                    if (tile is Gold)
+                    {
+                        Gold gold = (Gold)tile;
+                        _map.Hero.GoldCount += gold.Amount;
+                        _map.RemoveEnemy(gold.X,gold.Y);
+                    }
+
                     return true;
                 }
                 else
@@ -547,11 +594,19 @@ namespace GADE6112
                         }
                         else if (tile.Type == TileType.SwampCreature)
                         {
-                            tileChars[x, y] = "E";
+                            tileChars[x, y] = "S";
                         }
                         else if (tile.Type == TileType.Obstacle)
                         {
                             tileChars[x, y] = "#";
+                        }
+                        else if (tile.Type == TileType.Mage)
+                        {
+                            tileChars[x, y] = "M";
+                        }
+                        else if (tile.Type == TileType.Gold)
+                        {
+                            tileChars[x, y] = "G";
                         }
                     }
                 }
@@ -570,13 +625,13 @@ namespace GADE6112
             }
         }
 
-        public List<Enemy> Enemies { get; set; }
+        
 
-        public Model()
-        {
-            Hero hero = new Hero(1, 1, 'H', 1);
-            Enemies = new List<Enemy>();
-        }
+        //public Model()
+        //{
+        //    Hero hero = new Hero(1, 1, 'H', 1);
+        //    enemies = new Enemy[2];
+        //}
 
         public void AttackEnemy(Enemy enemy)
         {
@@ -591,25 +646,25 @@ namespace GADE6112
 
             public abstract override string ToString();
         }
+
         public class Gold : Item
         {
-            private int amount;
-            private Random random;
+            private int _amount;
+           // private Random random;
 
             public int Amount
             {
-                get { return amount; }
+                get { return _amount; }
             }
 
-            public Gold(int x, int y) : base(x, y)
+            public Gold(int x, int y, int amount) : base(x, y)
             {
-                random = new Random();
-                amount = random.Next(1, 6);
+                _amount = amount;
             }
 
             public override string ToString()
             {
-                return "Gold (" + amount + ")";
+                return "Gold (" + _amount + ")";
             }
         }
         public class Mage : Enemy
