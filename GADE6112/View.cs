@@ -12,11 +12,12 @@ namespace GADE6112
 {
     class View
     {
+        private Map _map = new Map(20, 30, 20, 30, 5, 5);
         private Controller _controller;
         public class MyForm : Form1
         {
            // private Model _model;
-            private Map _map = new Map(20, 30, 20, 30, 5);
+            
             private ComboBox _enemyComboBox;
             private Button _attackButton;
             private Controller _controller;
@@ -95,10 +96,11 @@ namespace GADE6112
             }
             public void UpdateEnemies()
             {
+
                 Label enemyLabel = form.Controls["enemyLabel"] as Label;
                 StringBuilder sb = new StringBuilder();
                 Model model = new Model();
-                foreach (Enemy enemy in model.Enemies)
+                foreach (Enemy enemy in _map.Enemies)
                 {
                     sb.AppendLine(enemy.ToString());
                 }

@@ -97,13 +97,14 @@ namespace GADE6112
             protected int _damage;
             protected Tile[] _vision;
             protected int _range;
+            protected int _gold;
 
             public int HP { get { return _hp; } set { _hp = value; } }
             public int MaxHP { get { return _maxHp; } set { _maxHp = value; } }
             public int Damage { get { return _damage; } set { _damage = value; } }
             public Tile[] Vision { get { return _vision; } }
-
             public int Range { get { return _range; } set { _range = value; } }
+            public int Gold { get { return _gold; } set { _gold = value; } }
 
             public enum Movement
             {
@@ -173,6 +174,13 @@ namespace GADE6112
 
             public abstract Movement ReturnMove(Movement move = 0);
             public abstract override string ToString();
+            public void Pickup(Item i)
+            {
+                if (i is Gold)
+                {
+                    _gold += ((Gold)i).Amount;
+                }
+            }
         }
         public abstract class Enemy : Character
         {
@@ -346,7 +354,7 @@ namespace GADE6112
 
             public override string ToString()
             {
-                return $"Player Stats:\nHP: {HP}/MaxHP: {MaxHP} \nDamage: {Damage} \n[{X},{Y}]";
+                return $"Player Stats:\nHP: {HP}/MaxHP: {MaxHP} \nDamage: {Damage} \n[{X},{Y}]\nGold: {goldCount}";
             }
         }
 
@@ -360,7 +368,11 @@ namespace GADE6112
             private int height;
             private Random random;
            
-            public List<Enemy> EnemiesLst { get; set; }
+            public Enemy[] EnemiesLst 
+            { 
+                get { return enemies; }
+                set { enemies = value; }
+            }
             public void RemoveEnemy(int x, int y)
             {
                 Tiles[x, y].Type = TileType.Empty;
@@ -511,6 +523,23 @@ namespace GADE6112
                 characters.AddRange(enemies);
                 return characters;
             }
+            public Item GetItemAtPosition(int x, int y)
+            {
+                Item item = null;
+                for (int i = 0; i < items.Length; i++)
+                {
+                    if (items[i].X == x && items[i].Y == y)
+                    {
+                        item = items[i];
+                        RemoveEnemy(items[i].X, items[i].Y);
+                        break;
+                    }
+                }
+                if (item != null)
+                    return item;
+                else return null;
+
+            }
         }
 
 
@@ -565,7 +594,10 @@ namespace GADE6112
                         _map.Hero.GoldCount += gold.Amount;
                         _map.RemoveEnemy(gold.X,gold.Y);
                     }
-
+                    if (tile! is Gold && tile is Item)
+                    {
+                        Map.GetItemAtPosition(tile.X, tile.Y);
+                    }
                     return true;
                 }
                 else
