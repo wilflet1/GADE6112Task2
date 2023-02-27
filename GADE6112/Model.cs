@@ -612,7 +612,27 @@ namespace GADE6112
                 return "Gold (" + amount + ")";
             }
         }
+        public class Mage : Enemy
+        {
+            private const int hp = 5;
+            private const int damage = 5;
 
+            public Mage(int x, int y) : base(x, y, hp, damage, 'M')
+            {
+            }
+
+            public override Movement ReturnMove(Movement move)
+            {
+                return Movement.NoMovement;
+            }
+
+            public override bool CheckRange(Character character)
+            {
+                int xDiff = Math.Abs(character.X - X);
+                int yDiff = Math.Abs(character.Y - Y);
+                return (xDiff <= 1 && yDiff <= 1);
+            }
+        }
     }
 
 }
