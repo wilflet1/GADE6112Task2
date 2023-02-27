@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Numerics;
 using System.Text;
 using static GADE6112.Model;
 using static GADE6112.Model.Character;
@@ -272,11 +273,16 @@ namespace GADE6112
         {
             private const int HERO_DAMAGE = 2;
             private int goldCount;
-
+            private bool _playerMoved;
             public int GoldCount
             {
                 get { return goldCount; }
                 set { goldCount = value; }
+            }
+            public bool PlayerMoved
+            {
+                get { return _playerMoved; }
+                set { _playerMoved = value; }
             }
             public Hero(int x, int y, char symbol, int hp) : base(x, y, 'H')
             {
@@ -604,6 +610,7 @@ namespace GADE6112
                 {
                     return false;
                 }
+
             }
 
             // Override ToString to return a string representation of the map
@@ -655,7 +662,74 @@ namespace GADE6112
 
                 return output;
             }
+            public void MoveEnemies()
+            {
+                Controller _controller = new Controller();
+                foreach (Enemy enemy in _map.Enemies)
+                {
+                    // Skip mages since they don't move
+                    if (enemy.Type == TileType.Mage) {
+                    continue;
+                }
+
+                // Get the enemy's current position on the map
+                int currRow = enemy.Y;
+                int currCol = enemy.X;
+
+                    // Get the player's current position on the map
+                int playerRow = _controller.Hero.X;
+                int playerCol = _controller.Hero.Y;
+
+                // Calculate the distance between the enemy and the player
+                int distance = Math.Abs(currRow - playerRow) + Math.Abs(currCol - playerCol);
+
+                // Only move if the player moved
+                if (_controller.Hero.PlayerMoved)
+                {
+                    _controller.Hero.PlayerMoved = false;
+                    // Check if the player is within attack range
+                    if (distance == 1)
+                    {
+                        // Do not move, only attack
+                        enemy.Attack(_controller.Hero);
+                        continue;
+                    }
+
+                    // Calculate the next position that brings the enemy closer to the player
+                    int nextRow = currRow;
+                    int nextCol = currCol;
+
+                    if (playerRow < currRow)
+                    {
+                        nextRow--;
+                        enemy.IsValidMove(Movement.Down);
+                    }
+                    else if (playerRow > currRow)
+                    {
+                        nextRow++;
+                            enemy.IsValidMove(Movement.Up);
+                        }
+                    else if (playerCol < currCol)
+                    {
+                        nextCol--;
+                            enemy.IsValidMove(Movement.Left);
+                        }
+                    else if (playerCol > currCol)
+                    {
+                        nextCol++;
+                            enemy.IsValidMove(Movement.Right);
+                        }
+                    else
+                            enemy.Attack(_controller.Hero);
+                        _controller.Map.UpdateVision();
+                    }
+                else
+                {
+                       _controller.Map.UpdateVision();
+                }
+            }
         }
+    }
 
         
 
