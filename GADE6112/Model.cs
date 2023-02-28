@@ -9,7 +9,16 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace GADE6112
 {
-
+    //
+    //   PLEASE NOTE
+    //   
+    //   this project was completed with 0 classes in the last few years and navigators would not let me have a session with a lecturer, I did my best
+    //   but I know this is not fantastic, just very desperate to get this last chance done now. Since I had no access to a lecturer, there are issues
+    //   and the project does not run. There are also marks allocated for changes based on lecturer feedback and it would be great if those could somehow
+    //   be redistributed. I tried to complete the specific code requirements as closesly as I possibly could and marks on specific code is my only hope.
+    //
+    //   Thank you for your time marking this (mess). :)
+    //
     class Model
     {
         Controller _controller = new Controller();

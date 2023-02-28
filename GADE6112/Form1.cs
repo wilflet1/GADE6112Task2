@@ -22,6 +22,10 @@ namespace GADE6112
         public Form1()
         {
             InitializeComponent();
+
+            GameEngine _gameEngine = new GameEngine();
+            statsLabel.Text = _gameEngine.Map.Hero.ToString();
+
             shopButtons = new Button[] { button2, button3, button4 };
 
             shopWeapons = _gameEngine.Shop.Weapons;
@@ -95,11 +99,6 @@ namespace GADE6112
             button4.Enabled = false;
         }
 
-        void Start()
-        {
-            //statsLabel = this.Controls["1"]
-            GameEngine _gameEngine = new GameEngine();
-            statsLabel.Text = _gameEngine.Map.Hero.ToString();
-        }
+        
     }
 }
