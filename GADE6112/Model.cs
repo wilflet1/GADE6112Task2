@@ -24,7 +24,7 @@ namespace GADE6112
             public int Y { get; set; }
             public int X { get; set; }
             protected char Symbol { get; set; }
-            public enum TileType { Hero, SwampCreature, Gold, Weapon, Obstacle, Empty, Mage };
+            public enum TileType { Hero, SwampCreature, Gold, Weapon, Obstacle, Empty, Mage, DroppedWeapon };
             public TileType Type { get; set; }
 
             public bool IsValidMove(Movement direction)
@@ -452,8 +452,9 @@ namespace GADE6112
                         }
                     }
                 }
-
                 enemies = new Enemy[numEnemies];
+          //      numWeapons = new [numEnemies];
+
                 for (int i = 0; i < numEnemies; i++)
                 {
                     int rand = random.Next(1, 3);
@@ -477,7 +478,7 @@ namespace GADE6112
                         x = random.Next(0, width);
                         y = random.Next(0, height);
                     }
-                    tiles[x, y] = new Weapon(x, y, new RangedWeapon(RangedWeapon.Types.Rifle));
+           //         tiles[x, y] = Tile.TileType.DroppedWeapon; place weapon task 2 3.1
                 }
 
                 UpdateVision();
