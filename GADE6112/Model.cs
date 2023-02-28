@@ -103,6 +103,7 @@ namespace GADE6112
             protected Tile[] _vision;
             protected int _range;
             protected int _gold;
+            protected Weapon _weapon;
 
             public int HP { get { return _hp; } set { _hp = value; } }
             public int MaxHP { get { return _maxHp; } set { _maxHp = value; } }
@@ -110,6 +111,7 @@ namespace GADE6112
             public Tile[] Vision { get { return _vision; } }
             public int Range { get { return _range; } set { _range = value; } }
             public int Gold { get { return _gold; } set { _gold = value; } }
+            public Weapon CurrentWeapon { get { return _weapon; } }
 
             public enum Movement
             {
@@ -122,13 +124,12 @@ namespace GADE6112
 
             public Character(int x, int y, char symbol) : base(x, y, symbol)
             {
+                
                 x = X;
                 y = Y;
                 symbol = Symbol;
-                //_hp = hp;
-                // _maxHp = hp;
-                // _damage = damage;
                 _vision = Vision;
+                
             }
 
             public virtual void Attack(Character target)
@@ -144,7 +145,7 @@ namespace GADE6112
             public virtual bool CheckRange(Tile target)
             {
                 int distance = DistanceTo(target);
-                return distance <= 1;
+                return distance <= _weapon.Range;
             }
 
             private int DistanceTo(Tile target)
@@ -178,25 +179,61 @@ namespace GADE6112
             }
 
             public abstract Movement ReturnMove(Movement move = 0);
-            public abstract override string ToString();
-            public void Pickup(Item i)
+
+            public virtual void Pickup(Item item)
             {
-                if (i is Gold)
+                if (item is Gold)
                 {
-                    _gold += ((Gold)i).Amount;
+                    _gold += ((Gold)item).Amount;
                 }
+                else if (item is Weapon)
+                {
+                    Equip((Weapon)item);
+                }
+            }
+
+            private void Equip(Weapon w)
+            {
+                _weapon = w;
+            }
+
+            public override string ToString()
+            {
+                string weaponString;
+                if (_weapon.Type.ToString() == "Bare Hands")
+                {
+                    weaponString = "Bare Hands";
+                }
+                else
+                {
+                    weaponString = $"{_weapon.Type.ToString()} ({_weapon.Damage} DMG, {_weapon.Range} Range, {_weapon.Durability} Durability)";
+                }
+                return $"HP: {_hp}/{_maxHp}\nCurrent Weapon: {weaponString}\nGold: {_gold}";
             }
         }
         public abstract class Enemy : Character
         {
             protected Random random;
-
+            protected Weapon _weapon;
+            public Weapon Weapon => _weapon;
             public Enemy(int x, int y, int damage, int hp, char symbol) : base(x, y, symbol)
             {
                 Damage = damage;
                 HP = hp;
                 MaxHP = hp;
                 random = new Random();
+                if (GetType() == typeof(SwampCreature))
+                {
+                   _weapon = new MeleeWeapon(MeleeWeapon.Types.Dagger);
+                }
+                else if (GetType() == typeof(Leader))
+                {
+                    _weapon = new MeleeWeapon(MeleeWeapon.Types.Longsword);
+                }
+            }
+            private void Equip(Weapon w)
+            {
+                _weapon = w;
             }
             public bool TakeDamage(int damage)
             {
@@ -205,7 +242,26 @@ namespace GADE6112
             }
             public override string ToString()
             {
-                return $"{GetType().Name} at [{X}, {Y}] (with {Damage} DMG)";
+                if (Weapon == null)
+                {
+                    return $"Barehanded: {GetType().Name} ({HP}/{MaxHP}HP) at [{X}, {Y}] ({Damage} DMG)";
+                }
+                else
+                {
+                    return $"Equipped: {GetType().Name} ({HP}/{MaxHP}HP) at [{X}, {Y}] with {Weapon.Type.ToString()} " +
+                           $"({Weapon.Durability}x{Weapon.Damage} DMG)";
+                }
+            }
+            public void PickUp(Item item)
+            {
+                if (item.GetType() == typeof(Gold))
+                {
+                    Gold += ((Gold)item).Amount;
+                }
+                else if (item.GetType().IsSubclassOf(typeof(Weapon)))
+                {
+                    Equip((Weapon)item);
+                }
             }
         }
         public class SwampCreature : Enemy
@@ -214,6 +270,8 @@ namespace GADE6112
             {
                 x = X;
                 y = Y;
+                Weapon weapon = new MeleeWeapon(MeleeWeapon.Types.Dagger);
+                _weapon = weapon;
 
             }
 
@@ -491,7 +549,6 @@ namespace GADE6112
                 Hero.Vision[2] = tiles[Hero.Y, Hero.X - 1];
                 Hero.Vision[3] = tiles[Hero.Y, Hero.X + 1];
 
-                // Check if there are any items in adjacent tiles
                 for (int i = Hero.Y - 1; i <= Hero.Y + 1; i++)
                 {
                     for (int j = Hero.X - 1; j <= Hero.X + 1; j++)
@@ -570,7 +627,6 @@ namespace GADE6112
             public GameEngine()
             {
                 _map = new Map(10, 20, 10, 20, 5, 5, 5);
-                // Set initial player position to the center of the map
                 _map.Hero.X = 5;
                 _map.Hero.Y = 5;
             }
@@ -934,6 +990,8 @@ namespace GADE6112
 
             public Leader(int x, int y) : base(x, y, 2, 20, 'B')
             {
+                Weapon weapon = new MeleeWeapon(MeleeWeapon.Types.Longsword);
+                _weapon = weapon;
             }
 
             public override Movement ReturnMove(Movement move = 0)
