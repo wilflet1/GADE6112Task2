@@ -90,22 +90,23 @@ namespace GADE6112
         }
         Form1 form = new Form1();
         public void UpdateHero()
-            {
-                Label heroLabel = form.Controls["heroLabel"] as Label;
-                heroLabel.Text = _controller.Hero.ToString();
-            }
-            public void UpdateEnemies()
-            {
+        {
+            Label heroLabel = form.Controls["heroLabel"] as Label;
+            heroLabel.Text = _controller.Hero.ToString();
+        }
+        public void UpdateEnemies()
+        {
 
-                Label enemyLabel = form.Controls["enemyLabel"] as Label;
-                StringBuilder sb = new StringBuilder();
-                Model model = new Model();
-                foreach (Enemy enemy in _map.Enemies)
-                {
-                    sb.AppendLine(enemy.ToString());
-                }
-                enemyLabel.Text = sb.ToString();
+            Label enemyLabel = form.Controls["enemyLabel"] as Label;
+            StringBuilder sb = new StringBuilder();
+            Model model = new Model();
+            foreach (Enemy enemy in _map.Enemies)
+            {
+                sb.AppendLine(enemy.ToString());
             }
-        
+            enemyLabel.Text = sb.ToString();
+        }
+
     }
+
 }

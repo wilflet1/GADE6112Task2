@@ -552,7 +552,7 @@ namespace GADE6112
         public class GameEngine
         {
             private Map _map;
-
+            View view = new View();
             public GameEngine()
             {
                 _map = new Map(10, 20, 10, 20, 5, 5);
@@ -605,10 +605,18 @@ namespace GADE6112
                         Map.GetItemAtPosition(tile.X, tile.Y);
                     }
                     return true;
+                    Map.UpdateVision();
+                    Map.ToString();
+                    view.UpdateEnemies();
+                    view.UpdateHero();
                 }
                 else
                 {
                     return false;
+                    Map.UpdateVision();
+                    Map.ToString();
+                    view.UpdateEnemies();
+                    view.UpdateHero();
                 }
 
             }
@@ -793,8 +801,23 @@ namespace GADE6112
                 int yDiff = Math.Abs(character.Y - Y);
                 return (xDiff <= 1 && yDiff <= 1);
             }
+            public void Attack(Enemy[] enemies)
+            {
+                foreach (Enemy enemy in enemies)
+                {
+                    int xDiff = Math.Abs(this.X - enemy.X);
+                    int yDiff = Math.Abs(this.Y - enemy.Y);
+                    int distance = xDiff + yDiff;
+
+                    if (distance <= 2 && enemy.Type == TileType.Mage || enemy.Type == TileType.SwampCreature || enemy.Type ==TileType.Hero)
+                    {
+                        //var target = enemy.X, enemy.Y;
+                        enemy.TakeDamage(this.Damage);
+                    }
+                }
+            }
         }
-    }
+        }
 
 }
 
