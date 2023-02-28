@@ -782,6 +782,48 @@ namespace GADE6112
 
             public abstract override string ToString();
         }
+        public abstract class Weapon : Item
+        {
+            protected int damage;
+            protected int durability;
+            protected int cost;
+            protected string weaponType;
+            public int Damage
+            {
+                get { return damage; }
+                set { damage = value; }
+            }
+
+            public virtual int Range
+            {
+                get { return 1; }
+            }
+
+            public int Durability
+            {
+                get { return durability; }
+                set { durability = value; }
+            }
+
+            public int Cost
+            {
+                get { return cost; }
+                set { cost = value; }
+            }
+
+            public string WeaponType
+            {
+                get { return weaponType; }
+                set { weaponType = value; }
+            }
+
+            public Weapon(int x, int y, char symbol) : base(x, y)
+            {
+            }
+
+            public abstract override string ToString();
+        }
+
 
         public class Gold : Item
         {

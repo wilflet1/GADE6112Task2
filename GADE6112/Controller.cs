@@ -31,9 +31,6 @@ namespace GADE6112
         public Map Map { get; set; }
         public Controller()
         {
-            
-
-           
             //hero.PropertyChanged += Hero_PropertyChanged;
             //_model.Enemies.CollectionChanged += Enemies_CollectionChanged;
         }
