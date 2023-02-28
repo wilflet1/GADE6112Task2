@@ -761,8 +761,6 @@ namespace GADE6112
             }
             public void MoveEnemies()
             {
-                Controller _controller = new Controller();
-
                 foreach (Enemy enemy in _map.Enemies)
                 {
                     if (enemy.Type == TileType.Mage)
@@ -773,50 +771,72 @@ namespace GADE6112
                     int currRow = enemy.Y;
                     int currCol = enemy.X;
 
-                    int playerRow = _controller.Hero.X;
-                    int playerCol = _controller.Hero.Y;
+                    int playerRow = _map.Hero.X;
+                    int playerCol = _map.Hero.Y;
 
                     int distance = Math.Abs(currRow - playerRow) + Math.Abs(currCol - playerCol);
 
-                    if (_controller.Hero.PlayerMoved)
+                    if (_map.Hero.PlayerMoved)
                     {
-                        _controller.Hero.PlayerMoved = false;
+                        _map.Hero.PlayerMoved = false;
+
                         if (distance == 1)
                         {
-                            enemy.Attack(_controller.Hero);
+                            enemy.Attack(_map.Hero);
                             continue;
                         }
 
                         int nextRow = currRow;
                         int nextCol = currCol;
 
-                        if (playerRow < currRow)
+                        if (playerRow < currRow && enemy.IsValidMove(Movement.Up))
                         {
                             nextRow--;
-                            enemy.IsValidMove(Movement.Down);
                         }
-                        else if (playerRow > currRow)
+                        else if (playerRow > currRow && enemy.IsValidMove(Movement.Down))
                         {
                             nextRow++;
-                            enemy.IsValidMove(Movement.Up);
                         }
-                        else if (playerCol < currCol)
+                        else if (playerCol < currCol && enemy.IsValidMove(Movement.Left))
                         {
                             nextCol--;
-                            enemy.IsValidMove(Movement.Left);
                         }
-                        else if (playerCol > currCol)
+                        else if (playerCol > currCol && enemy.IsValidMove(Movement.Right))
                         {
                             nextCol++;
-                            enemy.IsValidMove(Movement.Right);
                         }
                         else
-                            enemy.Attack(_controller.Hero);
-                        _controller.Map.UpdateVision();
+                        {
+                            Movement randomMove = (Movement)_map.Random.Next(0, 4);
+                            enemy.IsValidMove(randomMove);
+
+                            switch (randomMove)
+                            {
+                                case Movement.Up:
+                                    nextRow--;
+                                    enemy.Move(Movement.Up);
+                                    break;
+                                case Movement.Down:
+                                    nextRow++;
+                                    enemy.Move(Movement.Down);
+                                    break;
+                                case Movement.Left:
+                                    nextCol--;
+                                    enemy.Move(Movement.Left);
+                                    break;
+                                case Movement.Right:
+                                    nextCol++;
+                                    enemy.Move(Movement.Right);
+                                    break;
+                            }
+                        }
+
+                        
+                        _map.UpdateVision();
                     }
                     else
                     {
-                        _controller.Map.UpdateVision();
+                        _map.UpdateVision();
                     }
                 }
             }
