@@ -4,10 +4,8 @@ using System.Text;
 using static GADE6112.Model;
 using static GADE6112.Model.Character;
 using static GADE6112.Model.Tile;
-using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
-using System;
-using Microsoft.VisualBasic.ApplicationServices;
+
 
 namespace GADE6112
 {
@@ -111,7 +109,7 @@ namespace GADE6112
             public Tile[] Vision { get { return _vision; } }
             public int Range { get { return _range; } set { _range = value; } }
             public int Gold { get { return _gold; } set { _gold = value; } }
-            public Weapon CurrentWeapon { get { return _weapon; } }
+            public Weapon CurrentWeapon { get { return _weapon; } set { _weapon = value; } }
 
             public enum Movement
             {
@@ -134,7 +132,40 @@ namespace GADE6112
 
             public virtual void Attack(Character target)
             {
-                target.HP -= _damage;
+                if (_weapon != null)
+                {
+                    target.HP -= CurrentWeapon.Damage;
+                    CurrentWeapon.Durability--;
+                    if (CurrentWeapon.Durability == 0)
+                    {
+                        _weapon = null;
+                        CurrentWeapon = target._weapon;
+                        
+                    }
+                }
+                else
+                {
+                    target.HP -= 1;
+                    if (target.IsDead())
+                    {
+                        //
+                    }
+                }
+            }
+            public virtual void Loot(Character victim)
+            {
+                Gold += victim.Gold;
+                victim.Gold = 0;
+                if (_weapon != null && victim._weapon != null && !(this is Mage))
+                {
+                    CurrentWeapon = victim.CurrentWeapon;
+                    victim.CurrentWeapon = null;
+                    if(this is Hero)
+                    {
+                        
+                    }
+                    Console.WriteLine($"{GetType().Name} looted {CurrentWeapon.Type} from {victim.GetType().Name}!");
+                }
             }
 
             public bool IsDead()
@@ -272,6 +303,7 @@ namespace GADE6112
                 y = Y;
                 Weapon weapon = new MeleeWeapon(MeleeWeapon.Types.Dagger);
                 _weapon = weapon;
+                this.Gold = 1;
 
             }
 
@@ -349,6 +381,7 @@ namespace GADE6112
             public Hero(int x, int y, char symbol, int hp) : base(x, y, 'H')
             {
                 Damage = HERO_DAMAGE;
+                this.Gold = 0;
             }
 
             public override Movement ReturnMove(Movement movement)
@@ -780,7 +813,6 @@ namespace GADE6112
                     {
                         _map.Hero.PlayerMoved = false;
 
-
                         if (distance == 1)
                         {
                             enemy.Attack(_map.Hero);
@@ -1013,6 +1045,7 @@ namespace GADE6112
             {
                 Weapon weapon = new MeleeWeapon(MeleeWeapon.Types.Longsword);
                 _weapon = weapon;
+                this.Gold = 2;
             }
 
             public override Movement ReturnMove(Movement move = 0)
@@ -1140,6 +1173,7 @@ namespace GADE6112
 
             public Mage(int x, int y) : base(x, y, hp, damage, 'M')
             {
+                this.Gold = 3;
             }
 
             public override Movement ReturnMove(Movement move)

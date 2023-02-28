@@ -12,7 +12,7 @@ namespace GADE6112
 {
     class View
     {
-        private Map _map = new Map(20, 30, 20, 30, 5, 5);
+        private Map _map = new Map(20, 30, 20, 30, 5, 5,5);
         private Controller _controller;
         
         public class MyForm : Form1
