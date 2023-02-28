@@ -713,19 +713,15 @@ namespace GADE6112
                 // Calculate the distance between the enemy and the player
                 int distance = Math.Abs(currRow - playerRow) + Math.Abs(currCol - playerCol);
 
-                // Only move if the player moved
                 if (_controller.Hero.PlayerMoved)
                 {
                     _controller.Hero.PlayerMoved = false;
-                    // Check if the player is within attack range
                     if (distance == 1)
                     {
-                        // Do not move, only attack
                         enemy.Attack(_controller.Hero);
                         continue;
                     }
 
-                    // Calculate the next position that brings the enemy closer to the player
                     int nextRow = currRow;
                     int nextCol = currCol;
 
@@ -823,7 +819,41 @@ namespace GADE6112
 
             public abstract override string ToString();
         }
+        public class MeleeWeapon : Weapon
+        {
+            public enum Types { Dagger, Longsword }
 
+            public Types WeaponType { get; }
+
+            public override int Range { get { return 1; } }
+
+            public MeleeWeapon(Types weaponType, int x = 0, int y = 0) : base(x, y, 'D')
+            {
+                switch (weaponType)
+                {
+                    case Types.Dagger:
+                        this.WeaponType = Types.Dagger;
+                        this.Durability = 10;
+                        this.Damage = 3;
+                        this.Cost = 3;
+                        this.Symbol = 'D';
+                        break;
+
+                    case Types.Longsword:
+                        this.WeaponType = Types.Longsword;
+                        this.Durability = 6;
+                        this.Damage = 4;
+                        this.Cost = 5;
+                        this.Symbol = 'L';
+                        break;
+                }
+            }
+
+            public override string ToString()
+            {
+                return $"{this.WeaponType} ({this.Durability})";
+            }
+        }
 
         public class Gold : Item
         {
