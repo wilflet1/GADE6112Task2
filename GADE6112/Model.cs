@@ -430,7 +430,7 @@ namespace GADE6112
                 set { random = value; }
             }
 
-            public Map(int minWidth, int maxWidth, int minHeight, int maxHeight, int numEnemies, int numItems)
+            public Map(int minWidth, int maxWidth, int minHeight, int maxHeight, int numEnemies, int numItems, int numWeapons)
             {
                 random = new Random();
 
@@ -453,9 +453,6 @@ namespace GADE6112
                     }
                 }
 
-                //hero = (Hero)Create(TileType.Hero);
-                //Tiles[hero.Y, hero.X] = hero;
-
                 enemies = new Enemy[numEnemies];
                 for (int i = 0; i < numEnemies; i++)
                 {
@@ -471,34 +468,45 @@ namespace GADE6112
 
                     tiles[enemies[i].Y, enemies[i].X] = enemies[i];
                 }
+                for (int i = 0; i < numWeapons; i++)
+                {
+                    int x = random.Next(0, width);
+                    int y = random.Next(0, height);
+                    while (tiles[x, y].Type != Tile.TileType.Empty)
+                    {
+                        x = random.Next(0, width);
+                        y = random.Next(0, height);
+                    }
+                    tiles[x, y] = new Weapon(x, y, new RangedWeapon(RangedWeapon.Types.Rifle));
+                }
 
                 UpdateVision();
             }
 
             public void UpdateVision()
             {
-                //character.Vision[0] = tiles[y + 1, x];
-                //character.Vision[1] = tiles[y - 1, x];
-                //character.Vision[2] = tiles[y, x - 1];
-                //character.Vision[3] = tiles[y, x + 1];
+                Hero.Vision[0] = tiles[Hero.Y + 1, Hero.X];
+                Hero.Vision[1] = tiles[Hero.Y - 1, Hero.X];
+                Hero.Vision[2] = tiles[Hero.Y, Hero.X - 1];
+                Hero.Vision[3] = tiles[Hero.Y, Hero.X + 1];
 
-                //// Check if there are any items in adjacent tiles
-                //for (int i = y - 1; i <= y + 1; i++)
-                //{
-                //    for (int j = x - 1; j <= x + 1; j++)
-                //    {
-                //        if (i < 0 || i >= height || j < 0 || j >= width || (i == y && j == x))
-                //        {
-                //            continue;
-                //        }
+                // Check if there are any items in adjacent tiles
+                for (int i = Hero.Y - 1; i <= Hero.Y + 1; i++)
+                {
+                    for (int j = Hero.X - 1; j <= Hero.X + 1; j++)
+                    {
+                        if (i < 0 || i >= height || j < 0 || j >= width || (i == Hero.Y && j == Hero.X))
+                        {
+                            continue;
+                        }
 
-                //        if (tiles[i, j] is ItemTile)
-                //        {
-                //            ItemTile itemTile = (ItemTile)tiles[i, j];
-                //            character.Vision[4] = itemTile;
-                //        }
-                //    }
-                //}
+                        if (tiles[i, j] is Item)
+                        {
+                            Item itemTile = (Item)tiles[i, j];
+                            Hero.Vision[4] = itemTile;
+                        }
+                    }
+                }
             }
 
             private Tile Create(TileType type)
@@ -560,7 +568,7 @@ namespace GADE6112
             View view = new View();
             public GameEngine()
             {
-                _map = new Map(10, 20, 10, 20, 5, 5);
+                _map = new Map(10, 20, 10, 20, 5, 5, 5);
                 // Set initial player position to the center of the map
                 _map.Hero.X = 5;
                 _map.Hero.Y = 5;

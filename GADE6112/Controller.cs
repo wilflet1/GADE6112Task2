@@ -17,8 +17,6 @@ namespace GADE6112
         GameEngine _gameEngine = new GameEngine();
         
         public string? mapString;
-        
-        Map map = new Map(10, 20, 10, 20, 5, 5);
 
         Model.Hero hero = new Model.Hero(1, 1, 'f', 1);
 
