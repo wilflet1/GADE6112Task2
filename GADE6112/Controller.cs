@@ -18,9 +18,9 @@ namespace GADE6112
         
         public string? mapString;
 
-        Model.Hero hero = new Model.Hero(1, 1, 'f', 1);
+        //Model.Hero hero = new Model.Hero(1, 1, 'f', 1);
 
-        private Model? _model;
+        //private Model? _model;
 
         private View? _view;
 
@@ -41,20 +41,17 @@ namespace GADE6112
         {
             _view.UpdateEnemies();
         }
-        ////public void Initialize()
-        ////{
-        ////    // Connect the model and the view to the controller
-        ////    model.Controller = this;
-        ////    view.Controller = this;
+        //public void Initialize()
+        //{
+        //    model.Controller = this;
+        //    view.Controller = this;
 
-        ////    // Connect the model to the view
-        ////    view.Map = model.Map;
-        ////    view.Hero = model.Hero;
+        //    view.Map = model.Map;
+        //    view.Hero = model.Hero;
 
-        ////    // Connect the view to the model
-        ////    model.MapChanged += view.OnMapChanged;
-        ////    model.HeroChanged += view.OnHeroChanged;        ?? 4.2
-        ////}
+        //    model.MapChanged += view.OnMapChanged;
+        //    model.HeroChanged += view.OnHeroChanged;       
+        //}
 
         private void Form_KeyDown(object sender, KeyEventArgs e)
         {

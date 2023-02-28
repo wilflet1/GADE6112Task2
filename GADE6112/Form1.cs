@@ -18,6 +18,7 @@ namespace GADE6112
         private Weapon[] shopWeapons;
         public Label mapLabel, statsLabel;
         private GameEngine _gameEngine = new GameEngine();
+
         public Form1()
         {
             InitializeComponent();
@@ -47,7 +48,7 @@ namespace GADE6112
         private void button2_Click(object sender, EventArgs e) //first shop slot
         {
             Weapon weapon = shopWeapons[0];
-
+            Shop shop = new Shop(_gameEngine.Map.Hero);
 
             if (_gameEngine.Map.Hero.Gold > weapon.Cost)
             {
@@ -55,6 +56,7 @@ namespace GADE6112
                 UpdateShopButtons();
                 statsLabel.Text = _gameEngine.Map.Hero.ToString();
                 _gameEngine.Map.Hero.CurrentWeapon = weapon;
+                shopWeapons[0] = shop.RandomWeapon();
             }
             button2.Enabled = false;
         }
@@ -62,7 +64,7 @@ namespace GADE6112
         private void button3_Click(object sender, EventArgs e) //second shop slot
         {
             Weapon weapon = shopWeapons[1];
-
+            Shop shop = new Shop(_gameEngine.Map.Hero);
 
             if (_gameEngine.Map.Hero.Gold > weapon.Cost)
             {
@@ -70,6 +72,7 @@ namespace GADE6112
                 UpdateShopButtons();
                 statsLabel.Text = _gameEngine.Map.Hero.ToString();
                 _gameEngine.Map.Hero.CurrentWeapon = weapon;
+                shopWeapons[1] = shop.RandomWeapon();
             }
             button3.Enabled = false;
         }
@@ -77,14 +80,17 @@ namespace GADE6112
         private void button4_Click(object sender, EventArgs e) //third shop slot
         {
             Weapon weapon = shopWeapons[2];
-
+            Shop shop = new Shop(_gameEngine.Map.Hero);
 
             if (_gameEngine.Map.Hero.Gold > weapon.Cost)
             {
+                //shopWeapons[2];
+                
                 _gameEngine.Shop.Buy(weapon.Cost);
                 UpdateShopButtons();
                 statsLabel.Text = _gameEngine.Map.Hero.ToString();
                 _gameEngine.Map.Hero.CurrentWeapon = weapon;
+                shopWeapons[2] = shop.RandomWeapon();
             }
             button4.Enabled = false;
         }

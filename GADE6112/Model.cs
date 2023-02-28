@@ -1118,7 +1118,7 @@ namespace GADE6112
                 }
             }
 
-            private Weapon RandomWeapon()
+            public Weapon RandomWeapon()
             {
                 int randomIndex = random.Next(4);
                 switch (randomIndex)
