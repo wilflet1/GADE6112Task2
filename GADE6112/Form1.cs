@@ -14,10 +14,18 @@ namespace GADE6112
     public partial class Form1 : Form
     {
         public Label mapLabel, statsLabel;
+        private GameEngine _engine;
         public Form1()
         {
             InitializeComponent();
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            _engine.Save();
+        }
+ 
+
         void Start()
         {
             //statsLabel = this.Controls["1"]

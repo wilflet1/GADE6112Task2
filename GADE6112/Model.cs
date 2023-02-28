@@ -4,6 +4,8 @@ using System.Text;
 using static GADE6112.Model;
 using static GADE6112.Model.Character;
 using static GADE6112.Model.Tile;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace GADE6112
 {
@@ -620,7 +622,17 @@ namespace GADE6112
                 }
 
             }
+            public void Save()
+            {
+                // Create a binary formatter to serialize the Map object
+                BinaryFormatter formatter = new BinaryFormatter();
 
+                // Open a file stream to save the serialized object to disk
+                using (FileStream stream = new FileStream("savegame.bin", FileMode.Create))
+                {
+                    formatter.Serialize(stream, _map);
+                }
+            }
             // Override ToString to return a string representation of the map
             public override string ToString()
             {

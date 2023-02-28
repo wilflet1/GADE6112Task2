@@ -14,6 +14,7 @@ namespace GADE6112
     {
         private Map _map = new Map(20, 30, 20, 30, 5, 5);
         private Controller _controller;
+        
         public class MyForm : Form1
         {
            // private Model _model;
@@ -89,6 +90,7 @@ namespace GADE6112
 
         }
         Form1 form = new Form1();
+        
         public void UpdateHero()
         {
             Label heroLabel = form.Controls["heroLabel"] as Label;
