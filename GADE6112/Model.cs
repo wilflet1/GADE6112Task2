@@ -780,6 +780,7 @@ namespace GADE6112
                     {
                         _map.Hero.PlayerMoved = false;
 
+
                         if (distance == 1)
                         {
                             enemy.Attack(_map.Hero);
