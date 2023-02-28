@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Forms;
+using static GADE6112.Model;
 using static System.Windows.Forms.DataFormats;
 
 namespace GADE6112
@@ -18,7 +19,9 @@ namespace GADE6112
             View.MyForm frm = new View.MyForm();
             frm.MapLabel.Text = "";//engine.ToString();
 
-            
+            GameEngine gameEngine = new GameEngine();
+            gameEngine.Load("savegame.bin");
+
 
 
 

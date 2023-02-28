@@ -553,6 +553,7 @@ namespace GADE6112
 
         public class GameEngine
         {
+
             private Map _map;
             View view = new View();
             public GameEngine()
@@ -633,7 +634,16 @@ namespace GADE6112
                     formatter.Serialize(stream, _map);
                 }
             }
-            // Override ToString to return a string representation of the map
+
+            public void Load(string fileName)
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+
+                using (FileStream stream = new FileStream(fileName, FileMode.Open))
+                {
+                    _map = (Map)formatter.Deserialize(stream);
+                }
+            }
             public override string ToString()
             {
                 string[,] tileChars = new string[_map.Width, _map.Height];
