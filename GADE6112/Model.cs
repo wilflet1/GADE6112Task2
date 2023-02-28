@@ -377,9 +377,9 @@ namespace GADE6112
             private int width;
             private int height;
             private Random random;
-           
-            public Enemy[] EnemiesLst 
-            { 
+
+            public Enemy[] EnemiesLst
+            {
                 get { return enemies; }
                 set { enemies = value; }
             }
@@ -521,7 +521,7 @@ namespace GADE6112
                     case TileType.Mage:
                         return new Mage(x, y);
                     case TileType.Gold:
-                        return new Gold(x, y, random.Next(1,6));
+                        return new Gold(x, y, random.Next(1, 6));
                     default:
                         return null;
                 }
@@ -603,7 +603,7 @@ namespace GADE6112
                     {
                         Gold gold = (Gold)tile;
                         _map.Hero.GoldCount += gold.Amount;
-                        _map.RemoveEnemy(gold.X,gold.Y);
+                        _map.RemoveEnemy(gold.X, gold.Y);
                     }
                     if (tile! is Gold && tile is Item)
                     {
@@ -697,69 +697,67 @@ namespace GADE6112
             public void MoveEnemies()
             {
                 Controller _controller = new Controller();
+
                 foreach (Enemy enemy in _map.Enemies)
                 {
-                    // Skip mages since they don't move
-                    if (enemy.Type == TileType.Mage) {
-                    continue;
-                }
-
-                // Get the enemy's current position on the map
-                int currRow = enemy.Y;
-                int currCol = enemy.X;
-
-                    // Get the player's current position on the map
-                int playerRow = _controller.Hero.X;
-                int playerCol = _controller.Hero.Y;
-
-                // Calculate the distance between the enemy and the player
-                int distance = Math.Abs(currRow - playerRow) + Math.Abs(currCol - playerCol);
-
-                if (_controller.Hero.PlayerMoved)
-                {
-                    _controller.Hero.PlayerMoved = false;
-                    if (distance == 1)
+                    if (enemy.Type == TileType.Mage)
                     {
-                        enemy.Attack(_controller.Hero);
                         continue;
                     }
 
-                    int nextRow = currRow;
-                    int nextCol = currCol;
+                    int currRow = enemy.Y;
+                    int currCol = enemy.X;
 
-                    if (playerRow < currRow)
+                    int playerRow = _controller.Hero.X;
+                    int playerCol = _controller.Hero.Y;
+
+                    int distance = Math.Abs(currRow - playerRow) + Math.Abs(currCol - playerCol);
+
+                    if (_controller.Hero.PlayerMoved)
                     {
-                        nextRow--;
-                        enemy.IsValidMove(Movement.Down);
-                    }
-                    else if (playerRow > currRow)
-                    {
-                        nextRow++;
+                        _controller.Hero.PlayerMoved = false;
+                        if (distance == 1)
+                        {
+                            enemy.Attack(_controller.Hero);
+                            continue;
+                        }
+
+                        int nextRow = currRow;
+                        int nextCol = currCol;
+
+                        if (playerRow < currRow)
+                        {
+                            nextRow--;
+                            enemy.IsValidMove(Movement.Down);
+                        }
+                        else if (playerRow > currRow)
+                        {
+                            nextRow++;
                             enemy.IsValidMove(Movement.Up);
                         }
-                    else if (playerCol < currCol)
-                    {
-                        nextCol--;
+                        else if (playerCol < currCol)
+                        {
+                            nextCol--;
                             enemy.IsValidMove(Movement.Left);
                         }
-                    else if (playerCol > currCol)
-                    {
-                        nextCol++;
+                        else if (playerCol > currCol)
+                        {
+                            nextCol++;
                             enemy.IsValidMove(Movement.Right);
                         }
-                    else
+                        else
                             enemy.Attack(_controller.Hero);
                         _controller.Map.UpdateVision();
                     }
-                else
-                {
-                       _controller.Map.UpdateVision();
+                    else
+                    {
+                        _controller.Map.UpdateVision();
+                    }
                 }
             }
         }
-    }
 
-        
+
 
         //public Model()
         //{
@@ -825,7 +823,7 @@ namespace GADE6112
         {
             public enum Types { Dagger, Longsword }
 
-            public string WeaponType { get; }
+            //public string WeaponType { get; }
 
             public override int Range { get { return 1; } }
 
@@ -860,7 +858,7 @@ namespace GADE6112
         {
             public enum Types { Rifle, Longbow }
             public string WeaponType { get; }
-            public override int Range { get; } 
+            public override int Range { get; }
 
             public RangedWeapon(Types type, int x = 0, int y = 0) : base(x, y, ' ')
             {
@@ -925,7 +923,7 @@ namespace GADE6112
                 set { target = value; }
             }
 
-            public Leader(int x, int y) : base(x, y, 2,20,'B')
+            public Leader(int x, int y) : base(x, y, 2, 20, 'B')
             {
             }
 
@@ -974,10 +972,63 @@ namespace GADE6112
                 }
             }
         }
+        public class Shop
+        {
+            private Weapon[] weapons;
+            private Random random;
+            private Character buyer;
+
+            public Shop(Character buyer)
+            {
+                this.buyer = buyer;
+                weapons = new Weapon[3];
+                random = new Random();
+                for (int i = 0; i < weapons.Length; i++)
+                {
+                    weapons[i] = RandomWeapon();
+                }
+            }
+
+            private Weapon RandomWeapon()
+            {
+                int randomIndex = random.Next(4);
+                switch (randomIndex)
+                {
+                    case 0:
+                        return new MeleeWeapon(MeleeWeapon.Types.Dagger);
+                    case 1:
+                        return new MeleeWeapon(MeleeWeapon.Types.Longsword);
+                    case 2:
+                        return new RangedWeapon(RangedWeapon.Types.Longbow);
+                    default:
+                        return new RangedWeapon(RangedWeapon.Types.Rifle);
+                }
+            }
+
+            public bool CanBuy(int num)
+            {
+                return buyer.Gold >= weapons[num].Cost;
+            }
+
+            public void Buy(int num)
+            {
+                if (CanBuy(num))
+                {
+                    buyer.Gold -= weapons[num].Cost;
+                    buyer.Pickup(weapons[num]);
+                    weapons[num] = RandomWeapon();
+                }
+            }
+
+            public string DisplayWeapon(int num)
+            {
+                return $"Buy {weapons[num].GetType().Name} ({weapons[num].Cost} Gold)";
+            }
+        }
         public class Gold : Item
         {
             private int _amount;
-           // private Random random;
+            // private Random random;
 
             public int Amount
             {
@@ -1008,7 +1059,7 @@ namespace GADE6112
                 return Movement.NoMovement;
             }
 
-            public override bool CheckRange(Character character)
+            public override bool CheckRange(Tile character)
             {
                 int xDiff = Math.Abs(character.X - X);
                 int yDiff = Math.Abs(character.Y - Y);
@@ -1022,7 +1073,7 @@ namespace GADE6112
                     int yDiff = Math.Abs(this.Y - enemy.Y);
                     int distance = xDiff + yDiff;
 
-                    if (distance <= 2 && enemy.Type == TileType.Mage || enemy.Type == TileType.SwampCreature || enemy.Type ==TileType.Hero)
+                    if (distance <= 2 && enemy.Type == TileType.Mage || enemy.Type == TileType.SwampCreature || enemy.Type == TileType.Hero)
                     {
                         //var target = enemy.X, enemy.Y;
                         enemy.TakeDamage(this.Damage);
@@ -1030,7 +1081,7 @@ namespace GADE6112
                 }
             }
         }
-        }
+    }
 
 }
 
