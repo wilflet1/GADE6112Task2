@@ -6,6 +6,8 @@ using static GADE6112.Model.Character;
 using static GADE6112.Model.Tile;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
+using System;
+using Microsoft.VisualBasic.ApplicationServices;
 
 namespace GADE6112
 {
@@ -139,13 +141,13 @@ namespace GADE6112
                 return _hp <= 0;
             }
 
-            public virtual bool CheckRange(Character target)
+            public virtual bool CheckRange(Tile target)
             {
                 int distance = DistanceTo(target);
                 return distance <= 1;
             }
 
-            private int DistanceTo(Character target)
+            private int DistanceTo(Tile target)
             {
                 int dx = Math.Abs(X - target.X);
                 int dy = Math.Abs(Y - target.Y);
@@ -910,6 +912,66 @@ namespace GADE6112
             public override string ToString()
             {
                 return "";
+            }
+        }
+
+        public class Leader : Enemy
+        {
+            private Tile? target;
+            Controller _controller = new Controller();
+            public Tile Target
+            {
+                get { return target; }
+                set { target = value; }
+            }
+
+            public Leader(int x, int y) : base(x, y, 2,20,'B')
+            {
+            }
+
+            public override Movement ReturnMove(Movement move = 0)
+            {
+                if (CheckRange(target))
+                {
+                    return Movement.NoMovement;
+                }
+                else
+                {
+                    int dx = target.X - X;
+                    int dy = target.Y - Y;
+
+                    while (!IsPassable(_vision[(int)GetDirection(dx, dy)].Type))
+                    {
+                        dx = random.Next(-1, 2);
+                        dy = random.Next(-1, 2);
+                    }
+
+                    return GetDirection(dx, dy);
+                }
+            }
+
+            private Movement GetDirection(int dx, int dy)
+            {
+                if (dx > 0)
+                {
+                    return Movement.Right;
+                }
+                else if (dx < 0)
+                {
+                    return Movement.Left;
+                }
+                else if (dy > 0)
+                {
+                    return Movement.Down;
+                }
+                else if (dy < 0)
+                {
+                    return Movement.Up;
+                }
+                else
+                {
+                    return Movement.NoMovement;
+                }
             }
         }
         public class Gold : Item
