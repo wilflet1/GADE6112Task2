@@ -823,7 +823,7 @@ namespace GADE6112
         {
             public enum Types { Dagger, Longsword }
 
-            public Types WeaponType { get; }
+            public string WeaponType { get; }
 
             public override int Range { get { return 1; } }
 
@@ -832,7 +832,7 @@ namespace GADE6112
                 switch (weaponType)
                 {
                     case Types.Dagger:
-                        this.WeaponType = Types.Dagger;
+                        this.WeaponType = "Dagger";
                         this.Durability = 10;
                         this.Damage = 3;
                         this.Cost = 3;
@@ -840,7 +840,7 @@ namespace GADE6112
                         break;
 
                     case Types.Longsword:
-                        this.WeaponType = Types.Longsword;
+                        this.WeaponType = "Longsword";
                         this.Durability = 6;
                         this.Damage = 4;
                         this.Cost = 5;
@@ -854,7 +854,64 @@ namespace GADE6112
                 return $"{this.WeaponType} ({this.Durability})";
             }
         }
+        public class RangedWeapon : Weapon
+        {
+            public enum Types { Rifle, Longbow }
+            public string WeaponType { get; }
+            public override int Range { get; } 
 
+            public RangedWeapon(Types type, int x = 0, int y = 0) : base(x, y, ' ')
+            {
+                switch (type)
+                {
+                    case Types.Rifle:
+                        this.WeaponType = "Rifle";
+                        Durability = 3;
+                        Range = 3;
+                        Damage = 5;
+                        Cost = 7;
+                        break;
+                    case Types.Longbow:
+                        this.WeaponType = "Longbow";
+                        Durability = 4;
+                        Range = 2;
+                        Damage = 4;
+                        Cost = 6;
+                        break;
+                    default:
+                        this.WeaponType = "Ranged";
+                        break;
+                }
+            }
+
+            public RangedWeapon(Types type, int durability, int x = 0, int y = 0) : base(x, y, ' ')
+            {
+                switch (type)
+                {
+                    case Types.Rifle:
+                        this.WeaponType = "Rifle";
+                        Durability = durability;
+                        Range = 3;
+                        Damage = 5;
+                        Cost = 7;
+                        break;
+                    case Types.Longbow:
+                        this.WeaponType = "Longbow";
+                        Durability = durability;
+                        Range = 2;
+                        Damage = 4;
+                        Cost = 6;
+                        break;
+                    default:
+                        this.WeaponType = "Ranged";
+                        break;
+                }
+            }
+            public override string ToString()
+            {
+                return "";
+            }
+        }
         public class Gold : Item
         {
             private int _amount;
