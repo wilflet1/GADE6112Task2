@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -13,18 +14,80 @@ namespace GADE6112
 {
     public partial class Form1 : Form
     {
+        private Button[] shopButtons;
+        private Weapon[] shopWeapons;
         public Label mapLabel, statsLabel;
-        private GameEngine _engine;
+        private GameEngine _gameEngine = new GameEngine();
         public Form1()
         {
             InitializeComponent();
-        }
+            shopButtons = new Button[] { button2, button3, button4 };
 
+            shopWeapons = _gameEngine.Shop.Weapons;
+        }
+        private void UpdateShopButtons()
+        {
+            for (int i = 0; i < shopButtons.Length; i++)
+            {
+                Button button = shopButtons[i];
+                Weapon weapon = shopWeapons[i];
+
+                button.Text = weapon.Type.ToString();
+
+                button.Enabled = _gameEngine.Map.Hero.Gold >= weapon.Cost;
+
+                button.Tag = i;
+            }
+        }
         private void button1_Click(object sender, EventArgs e)
         {
-            _engine.Save();
+            _gameEngine.Save();
         }
- 
+
+        private void button2_Click(object sender, EventArgs e) //first shop slot
+        {
+            Weapon weapon = shopWeapons[0];
+
+
+            if (_gameEngine.Map.Hero.Gold > weapon.Cost)
+            {
+                _gameEngine.Shop.Buy(weapon.Cost);
+                UpdateShopButtons();
+                statsLabel.Text = _gameEngine.Map.Hero.ToString();
+                _gameEngine.Map.Hero.CurrentWeapon = weapon;
+            }
+            button2.Enabled = false;
+        }
+
+        private void button3_Click(object sender, EventArgs e) //second shop slot
+        {
+            Weapon weapon = shopWeapons[1];
+
+
+            if (_gameEngine.Map.Hero.Gold > weapon.Cost)
+            {
+                _gameEngine.Shop.Buy(weapon.Cost);
+                UpdateShopButtons();
+                statsLabel.Text = _gameEngine.Map.Hero.ToString();
+                _gameEngine.Map.Hero.CurrentWeapon = weapon;
+            }
+            button3.Enabled = false;
+        }
+
+        private void button4_Click(object sender, EventArgs e) //third shop slot
+        {
+            Weapon weapon = shopWeapons[2];
+
+
+            if (_gameEngine.Map.Hero.Gold > weapon.Cost)
+            {
+                _gameEngine.Shop.Buy(weapon.Cost);
+                UpdateShopButtons();
+                statsLabel.Text = _gameEngine.Map.Hero.ToString();
+                _gameEngine.Map.Hero.CurrentWeapon = weapon;
+            }
+            button4.Enabled = false;
+        }
 
         void Start()
         {

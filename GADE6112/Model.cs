@@ -461,10 +461,10 @@ namespace GADE6112
 
         public class Map
         {
-            private Tile[,] tiles;
-            private Hero hero;
+            private Tile[,]? tiles;
+            private Hero? hero;
             private Enemy[] enemies;
-            private Item[] items;
+            private Item[]? items;
             private int width;
             private int height;
             private Random random;
@@ -521,66 +521,14 @@ namespace GADE6112
                 set { random = value; }
             }
 
-            public Map(int minWidth, int maxWidth, int minHeight, int maxHeight, int numEnemies, int numItems, int numWeapons)
-            {
-                random = new Random();
-
-                width = random.Next(minWidth, maxWidth + 1);
-                height = random.Next(minHeight, maxHeight + 1);
-
-
-                for (int i = 0; i < height; i++)
-                {
-                    for (int j = 0; j < width; j++)
-                    {
-                        if (i == 0 || i == height - 1 || j == 0 || j == width - 1)
-                        {
-                            Tiles[i, j] = new Obstacle(j, i, '#');
-                        }
-                        else
-                        {
-                            Tiles[i, j] = new EmptyTile(j, i, '.');
-                        }
-                    }
-                }
-                enemies = new Enemy[numEnemies];
-          //      numWeapons = new [numEnemies];
-
-                for (int i = 0; i < numEnemies; i++)
-                {
-                    int rand = random.Next(1, 3);
-                    if (rand == 1)
-                    {
-                        enemies[i] = (SwampCreature)Create(TileType.SwampCreature);
-                    }
-                    if (rand == 2)
-                    {
-                        enemies[i] = (Mage)Create(TileType.Mage);
-                    }
-
-                    tiles[enemies[i].Y, enemies[i].X] = enemies[i];
-                }
-                for (int i = 0; i < numWeapons; i++)
-                {
-                    int x = random.Next(0, width);
-                    int y = random.Next(0, height);
-                    while (tiles[x, y].Type != Tile.TileType.Empty)
-                    {
-                        x = random.Next(0, width);
-                        y = random.Next(0, height);
-                    }
-           //         tiles[x, y] = Tile.TileType.DroppedWeapon; place weapon task 2 3.1
-                }
-
-                UpdateVision();
-            }
+            
 
             public void UpdateVision()
             {
-                Hero.Vision[0] = tiles[Hero.Y + 1, Hero.X];
-                Hero.Vision[1] = tiles[Hero.Y - 1, Hero.X];
-                Hero.Vision[2] = tiles[Hero.Y, Hero.X - 1];
-                Hero.Vision[3] = tiles[Hero.Y, Hero.X + 1];
+                hero.Vision[0] = tiles[Hero.Y + 1, Hero.X];
+                hero.Vision[1] = tiles[Hero.Y - 1, Hero.X];
+                hero.Vision[2] = tiles[Hero.Y, Hero.X - 1];
+                hero.Vision[3] = tiles[Hero.Y, Hero.X + 1];
 
                 for (int i = Hero.Y - 1; i <= Hero.Y + 1; i++)
                 {
@@ -648,6 +596,60 @@ namespace GADE6112
                     return item;
                 else return null;
 
+
+            }
+            public Map(int minWidth, int maxWidth, int minHeight, int maxHeight, int numEnemies, int numItems, int numWeapons)
+            {
+                random = new Random();
+
+                width = random.Next(minWidth, maxWidth + 1);
+                height = random.Next(minHeight, maxHeight + 1);
+                Tiles = new Tile[height, width];
+
+                for (int i = 0; i < height; i++)
+                {
+                    for (int j = 0; j < width; j++)
+                    {
+                        if (i == 0 || i == height - 2 || j == 0 || j == width - 2)
+                        {
+                            Tiles[i, j] = new Obstacle(j, i, '#');
+                        }
+                        else
+                        {
+                            Tiles[i, j] = new EmptyTile(j, i, '.');
+                        }
+                    }
+                }
+                enemies = new Enemy[numEnemies];
+                //      numWeapons = new [numEnemies];
+
+                for (int i = 0; i < numEnemies; i++)
+                {
+                    int rand = random.Next(1, 3);
+                    if (rand == 1)
+                    {
+                        enemies[i] = (SwampCreature)Create(TileType.SwampCreature);
+                    }
+                    if (rand == 2)
+                    {
+                        enemies[i] = (Mage)Create(TileType.Mage);
+                    }
+
+                    tiles[enemies[i].Y, enemies[i].X] = enemies[i];
+                }
+                for (int i = 0; i < numWeapons; i++)
+                {
+                    int x = random.Next(0, width);
+                    int y = random.Next(0, height);
+                    while (tiles[x, y].Type != Tile.TileType.Empty)
+                    {
+                        x = random.Next(0, width);
+                        y = random.Next(0, height);
+                    }
+                    // tiles[x, y] = tDroppedWeapon; //place weapon task 2 3.1
+                }
+
+                UpdateVision();
             }
         }
 
@@ -656,6 +658,7 @@ namespace GADE6112
         {
 
             private Map _map;
+            private Shop _shop;
             View view = new View();
             public GameEngine()
             {
@@ -665,6 +668,7 @@ namespace GADE6112
             }
 
             public Map Map => _map;
+            public Shop Shop => _shop;
 
             public bool MovePlayer(Movement direction)
             {
@@ -1099,6 +1103,10 @@ namespace GADE6112
             private Random random;
             private Character buyer;
 
+            public Weapon[] Weapons
+            {
+                get { return weapons; }
+            }
             public Shop(Character buyer)
             {
                 this.buyer = buyer;

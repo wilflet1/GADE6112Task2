@@ -11,16 +11,16 @@ namespace GADE6112
         [STAThread]
         static void Main()
         {
-           
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
-            
             View.MyForm frm = new View.MyForm();
             frm.MapLabel.Text = "";//engine.ToString();
 
             GameEngine gameEngine = new GameEngine();
             gameEngine.Load("savegame.bin");
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form1());
+            
+            
 
 
 
